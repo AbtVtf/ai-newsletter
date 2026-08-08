@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Daily Prompt — News-stand</title>
+<style>
+  @font-face { font-family: 'Jacquard 24'; src: url(../assets/fonts/jacquard.woff2) format('woff2'); font-display: block; }
+  @font-face { font-family: 'Press Start 2P'; src: url(../assets/fonts/press.woff2) format('woff2'); font-display: block; }
+  @font-face { font-family: 'VT323'; src: url(../assets/fonts/vt323.woff2) format('woff2'); font-display: block; }
+
+  :root {
+    --paper: #E9E4D6; --paper-deep: #DED8C4; --ink: #211E18; --ink-soft: #57503F;
+    --accent: #BF3B2B; --rule: #211E18;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #0B1006; --paper-deep: #121A0A; --ink: #9FE870; --ink-soft: #6BA34C;
+      --accent: #FFB000; --rule: #46662F;
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0; background: var(--paper); color: var(--ink);
+    font-family: 'VT323', 'Courier New', monospace; font-size: 19px;
+    display: flex; flex-direction: column;
+  }
+  #root { display: flex; flex-direction: column; height: 100%; }
+
+  .chrome {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 10;
+    background: var(--paper);
+    transform: translateY(calc(-100% + 14px));
+    transition: transform 0.22s steps(6);
+    box-shadow: 0 3px 0 var(--rule);
+  }
+  .chrome:hover, .chrome:focus-within { transform: none; }
+  @media (prefers-reduced-motion: reduce) { .chrome { transition: none; } }
+  .peek {
+    height: 14px; background: var(--paper-deep);
+    border-top: 2px solid var(--rule); border-bottom: 2px solid var(--rule);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Press Start 2P', monospace; font-size: 6px;
+    letter-spacing: 3px; color: var(--ink-soft); text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  header.bar {
+    border-bottom: 4px double var(--rule);
+    padding: 10px 16px 8px;
+    display: flex; flex-wrap: wrap; align-items: center; gap: 8px 24px;
+  }
+  .brand { font-family: 'Jacquard 24', serif; font-size: 40px; line-height: 1; white-space: nowrap; }
+  .brand small {
+    display: block; font-family: 'Press Start 2P', monospace; font-size: 7px;
+    letter-spacing: 2px; text-transform: uppercase; color: var(--ink-soft); margin-top: 4px;
+  }
+
+  .timeline { display: flex; gap: 8px; overflow-x: auto; padding: 4px 2px; flex: 1; min-width: 200px; }
+  .issue-btn {
+    font-family: 'Press Start 2P', monospace; font-size: 8px; letter-spacing: 1px;
+    text-transform: uppercase; line-height: 1.7;
+    background: var(--paper-deep); color: var(--ink);
+    border: 2px solid var(--rule); padding: 6px 10px; cursor: pointer; white-space: nowrap;
+  }
+  .issue-btn:hover { border-color: var(--accent); }
+  .issue-btn.sel { border-color: var(--accent); color: var(--accent); box-shadow: 3px 3px 0 var(--accent); }
+  .issue-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .statsbar {
+    background: var(--paper-deep);
+    padding: 8px 16px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 22px;
+  }
+  .chart-wrap { display: flex; align-items: center; gap: 14px; flex: 1; min-width: 260px; }
+  .chart-label {
+    font-family: 'Press Start 2P', monospace; font-size: 8px; letter-spacing: 1px;
+    text-transform: uppercase; color: var(--ink-soft); white-space: nowrap;
+  }
+  canvas.chart { image-rendering: pixelated; flex: 1; max-width: 420px; height: 36px; }
+  .legend { display: flex; flex-wrap: wrap; gap: 4px 14px; align-items: center; }
+  .legend .key { display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+  .legend canvas { image-rendering: pixelated; width: 14px; height: 14px; border: 1px solid var(--rule); }
+  .legend .n { color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+  .meta { text-transform: uppercase; letter-spacing: 1px; color: var(--ink-soft); font-size: 16px; white-space: nowrap; }
+  .meta b { color: var(--ink); font-weight: 400; }
+
+  iframe.edition { flex: 1; border: none; width: 100%; background: var(--paper); padding-top: 14px; }
+
+  .empty { margin: auto; text-align: center; font-family: 'Press Start 2P', monospace; font-size: 11px; line-height: 2.2; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="vendor/react.js"></script>
+<script src="vendor/react-dom.js"></script>
+<script src="../output/editions.js"></script>
+<script>
+(function () {
+  var h = React.createElement;
+  var EDITIONS = (window.EDITIONS || []).slice().sort(function (a, b) {
+    return a.date < b.date ? 1 : -1; // newest first
+  });
+
+  var CATS = ["Community", "Labs", "Press", "Papers", "Newsletters", "Video", "Other"];
+  // 1-bit fill patterns, one per category: returns true where ink goes
+  var PATTERNS = [
+    function (x, y) { return true; },                       // solid
+    function (x, y) { return (x + y) % 2 === 0; },          // checker
+    function (x, y) { return x % 3 === 0; },                // vertical stripes
+    function (x, y) { return y % 3 === 0; },                // horizontal stripes
+    function (x, y) { return (x + y) % 4 === 0; },          // diagonal
+    function (x, y) { return x % 4 === 0 && y % 4 === 0; }, // sparse dots
+    function (x, y) { return (x % 4 === 0) !== (y % 4 === 0); },
+  ];
+
+  function cssVar(name) {
+    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  }
+
+  function drawPattern(canvas, patIdx, w, hgt) {
+    var ctx = canvas.getContext('2d');
+    canvas.width = w; canvas.height = hgt;
+    var ink = cssVar('--ink'), paper = cssVar('--paper');
+    for (var y = 0; y < hgt; y++) for (var x = 0; x < w; x++) {
+      ctx.fillStyle = PATTERNS[patIdx](x, y) ? ink : paper;
+      ctx.fillRect(x, y, 1, 1);
+    }
+  }
+
+  function drawChart(canvas, split) {
+    var W = 210, H = 18;
+    var ctx = canvas.getContext('2d');
+    canvas.width = W; canvas.height = H;
+    var ink = cssVar('--ink'), paper = cssVar('--paper');
+    var total = 0;
+    CATS.forEach(function (c) { total += split[c] || 0; });
+    ctx.fillStyle = paper; ctx.fillRect(0, 0, W, H);
+    if (!total) return;
+    var x0 = 1;
+    CATS.forEach(function (cat, ci) {
+      var n = split[cat] || 0;
+      if (!n) return;
+      var w = Math.max(2, Math.round((W - 2) * n / total));
+      for (var y = 1; y < H - 1; y++) for (var x = x0; x < Math.min(x0 + w, W - 1); x++) {
+        ctx.fillStyle = PATTERNS[ci](x, y) ? ink : paper;
+        ctx.fillRect(x, y, 1, 1);
+      }
+      x0 += w + 1; // 1px gutter between segments
+    });
+    ctx.strokeStyle = ink; ctx.lineWidth = 2;
+    ctx.strokeRect(0.5, 0.5, W - 1, H - 1);
+  }
+
+  function App() {
+    var state = React.useState(0), sel = state[0], setSel = state[1];
+    var chartRef = React.useRef(null);
+    var legendRefs = React.useRef({});
+    var edition = EDITIONS[sel];
+
+    React.useEffect(function () {
+      if (!edition) return;
+      function redraw() {
+        drawChart(chartRef.current, edition.split || {});
+        CATS.forEach(function (cat, ci) {
+          var el = legendRefs.current[cat];
+          if (el) drawPattern(el, ci, 14, 14);
+        });
+      }
+      redraw();
+      var mq = window.matchMedia('(prefers-color-scheme: dark)');
+      mq.addEventListener('change', redraw);
+      return function () { mq.removeEventListener('change', redraw); };
+    }, [sel]);
+
+    if (!edition) {
+      return h('div', { className: 'empty' },
+        'NO EDITIONS YET', h('br'), 'run: python -m pipeline.main');
+    }
+
+    var split = edition.split || {};
+    return h(React.Fragment, null,
+      h('div', { className: 'chrome' },
+      h('header', { className: 'bar' },
+        h('div', { className: 'brand' }, 'The Daily Prompt',
+          h('small', null, 'news-stand · ' + EDITIONS.length + ' edition' + (EDITIONS.length > 1 ? 's' : '') + ' on file')),
+        h('nav', { className: 'timeline', 'aria-label': 'past editions' },
+          EDITIONS.map(function (ed, i) {
+            return h('button', {
+              key: ed.date,
+              className: 'issue-btn' + (i === sel ? ' sel' : ''),
+              onClick: function () { setSel(i); },
+            }, '№ ' + ed.issue_no, h('br'), ed.date);
+          }))),
+      h('div', { className: 'statsbar' },
+        h('div', { className: 'chart-wrap' },
+          h('span', { className: 'chart-label' }, 'Sources'),
+          h('canvas', { className: 'chart', ref: chartRef,
+                        'aria-label': 'source split for this edition' }),
+        ),
+        h('div', { className: 'legend' },
+          CATS.filter(function (c) { return split[c]; }).map(function (cat) {
+            return h('span', { className: 'key', key: cat },
+              h('canvas', { ref: function (el) { legendRefs.current[cat] = el; } }),
+              cat, ' ', h('span', { className: 'n' }, String(split[cat])));
+          })),
+        h('span', { className: 'meta' },
+          h('b', null, edition.items_scanned), ' items · ',
+          h('b', null, edition.arxiv_new), ' arXiv · ',
+          h('b', null, edition.pages), ' sections · $', edition.cost)),
+      h('div', { className: 'peek' }, '· · · news-stand · · ·')),
+      h('iframe', {
+        className: 'edition',
+        title: 'Edition of ' + edition.date_display,
+        src: '../output/' + edition.date + '/index.html',
+      }));
+  }
+
+  ReactDOM.createRoot(document.getElementById('root')).render(h(App));
+})();
+</script>
+</body>
+</html>

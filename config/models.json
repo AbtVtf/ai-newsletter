@@ -1,0 +1,24 @@
+{
+  "provider": "openrouter",
+  "base_url": "https://openrouter.ai/api/v1",
+  "api_key_env": "OPENROUTER_API_KEY",
+  "roles": {
+    "summarizer": {
+      "model": "google/gemma-4-26b-a4b-it",
+      "comment": "High-volume per-item summarization. Cheapest Gemma 4; MoE with 4B active params. ~$0.07/M input."
+    },
+    "writer": {
+      "model": "google/gemma-4-31b-it",
+      "comment": "Writes the newspaper copy: headlines, decks, briefs, classifieds gags. Tested 2026-08-07, nails the 1920s broadsheet voice."
+    },
+    "editor": {
+      "model": "z-ai/glm-4.6",
+      "reasoning_effort": "low",
+      "comment": "Ranks/selects the day's stories and does final edit pass. reasoning_effort caps GLM's thinking so it doesn't spend the whole token budget before answering. Swap to z-ai/glm-5.2 if selection quality disappoints."
+    },
+    "fallback": {
+      "model": "google/gemma-4-31b-it:free",
+      "comment": "Free tier of the writer. Shared upstream pool, often 429s — use as opportunistic fallback only, never the primary."
+    }
+  }
+}

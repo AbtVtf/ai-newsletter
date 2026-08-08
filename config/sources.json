@@ -1,0 +1,540 @@
+{
+  "comment": "Source registry for the daily AI newspaper. status: 'verified' = live-tested via deep research on 2026-08-07; 'candidate' = named in research but feed not yet tested. The fetcher should tolerate empty arXiv feeds on weekends/holidays and follow redirects (takara.ai 307s).",
+  "papers": [
+    {
+      "name": "arXiv cs.AI + cs.LG + cs.CL",
+      "url": "https://rss.arxiv.org/rss/cs.AI+cs.LG+cs.CL",
+      "type": "rss",
+      "cadence": "daily at midnight ET, empty Sat/Sun and arXiv holidays",
+      "status": "verified",
+      "notes": "Official feed, categories combined with '+', capped at 2000 items."
+    },
+    {
+      "name": "Hugging Face Daily Papers (official JSON API)",
+      "url": "https://huggingface.co/api/daily_papers",
+      "type": "json",
+      "cadence": "daily",
+      "status": "verified",
+      "notes": "Official successor ecosystem to Papers With Code (sunset 2025-07-24; domain redirects to huggingface.co/papers/trending). Prefer this API long-term."
+    },
+    {
+      "name": "Takara TLDR \u2014 HF Daily Papers RSS bridge",
+      "url": "https://papers.takara.ai/api/feed",
+      "type": "rss",
+      "cadence": "daily",
+      "status": "verified",
+      "notes": "Unofficial community bridge; responds with cross-host 307 (follow redirects). Could vanish \u2014 treat as secondary to the official JSON API. /api/summary gives LLM-summarized variant."
+    }
+  ],
+  "communities": [
+    {
+      "name": "Hacker News (Algolia API)",
+      "url": "https://hn.algolia.com/api/v1/search?query=AI&tags=story&numericFilters=points%3E50",
+      "type": "json",
+      "cadence": "real-time",
+      "status": "verified",
+      "notes": "Free, no auth, 10k req/hr/IP. Use created_at_i window + points filter for 'top AI stories of the day'. ~1000-hit pagination cap; URL-encode > and <."
+    },
+    {
+      "name": "r/MachineLearning",
+      "url": "https://www.reddit.com/r/MachineLearning/top/.rss?t=day",
+      "type": "rss",
+      "cadence": "real-time",
+      "status": "candidate",
+      "notes": "Reddit RSS works unauthenticated at low rates; set a distinct User-Agent."
+    },
+    {
+      "name": "r/LocalLLaMA",
+      "url": "https://www.reddit.com/r/LocalLLaMA/top/.rss?t=day",
+      "type": "rss",
+      "cadence": "real-time",
+      "status": "candidate",
+      "notes": "Best community for open-weights releases and local-inference chatter."
+    },
+    {
+      "name": "LessWrong (AI tag, GraphQL)",
+      "url": "https://www.lesswrong.com/graphql",
+      "type": "graphql",
+      "cadence": "real-time",
+      "status": "candidate",
+      "notes": "Public GraphQL API documented by the community; also plain RSS at lesswrong.com/feed.xml."
+    }
+  ],
+  "labs": [
+    {
+      "name": "OpenAI News",
+      "url": "https://openai.com/news/rss.xml",
+      "type": "rss",
+      "cadence": "several/week",
+      "status": "verified"
+    },
+    {
+      "name": "Google Research Blog",
+      "url": "https://research.google/blog/rss/",
+      "type": "rss",
+      "cadence": "weekly-ish",
+      "status": "verified"
+    },
+    {
+      "name": "Berkeley BAIR Blog",
+      "url": "https://bair.berkeley.edu/blog/feed.xml",
+      "type": "rss",
+      "cadence": "monthly-ish",
+      "status": "verified"
+    },
+    {
+      "name": "MIT News \u2014 AI topic",
+      "url": "https://news.mit.edu/rss/topic/artificial-intelligence2",
+      "type": "rss",
+      "cadence": "daily-ish",
+      "status": "verified",
+      "notes": "Includes loosely AI-tagged general-science stories; filter downstream."
+    },
+    {
+      "name": "Anthropic News",
+      "url": "https://www.anthropic.com/news",
+      "type": "scrape",
+      "cadence": "several/week",
+      "status": "candidate",
+      "notes": "No official RSS found in research pass \u2014 needs scraping or a third-party bridge. Verify."
+    },
+    {
+      "name": "Google DeepMind Blog",
+      "url": "https://deepmind.google/discover/blog/",
+      "type": "scrape",
+      "cadence": "weekly-ish",
+      "status": "candidate",
+      "notes": "RSS availability unverified."
+    },
+    {
+      "name": "Meta AI Blog",
+      "url": "https://ai.meta.com/blog/",
+      "type": "scrape",
+      "cadence": "weekly-ish",
+      "status": "candidate"
+    },
+    {
+      "name": "Mistral AI News",
+      "url": "https://mistral.ai/news/",
+      "type": "scrape",
+      "cadence": "sporadic",
+      "status": "candidate"
+    },
+    {
+      "name": "xAI News",
+      "url": "https://x.ai/news",
+      "type": "scrape",
+      "cadence": "sporadic",
+      "status": "candidate"
+    }
+  ],
+  "press": [
+    {
+      "name": "WIRED \u2014 AI tag",
+      "url": "https://www.wired.com/feed/tag/ai/latest/rss",
+      "type": "rss",
+      "cadence": "daily",
+      "status": "verified"
+    },
+    {
+      "name": "The Verge \u2014 AI",
+      "url": "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml",
+      "type": "atom",
+      "cadence": "daily",
+      "status": "verified",
+      "notes": "Atom, not RSS 2.0."
+    },
+    {
+      "name": "Ars Technica \u2014 AI",
+      "url": "https://arstechnica.com/ai/feed/",
+      "type": "rss",
+      "cadence": "daily",
+      "status": "verified"
+    },
+    {
+      "name": "TechCrunch \u2014 AI",
+      "url": "https://techcrunch.com/category/artificial-intelligence/feed/",
+      "type": "rss",
+      "cadence": "daily",
+      "status": "verified"
+    }
+  ],
+  "newsletters": [
+    {
+      "name": "AI News (smol.ai)",
+      "url": "https://news.smol.ai/rss.xml",
+      "type": "rss",
+      "cadence": "weekdays",
+      "status": "verified",
+      "notes": "THE architectural model for this project: LLM pipeline summarizing 22 Discords, 12 subreddits, 544 X accounts. Old Buttondown archive is dead \u2014 use news.smol.ai only."
+    },
+    {
+      "name": "TLDR AI",
+      "url": "https://tldr.tech/ai",
+      "type": "scrape",
+      "cadence": "weekdays",
+      "status": "verified",
+      "notes": "1M+ readers. RSS availability unverified."
+    },
+    {
+      "name": "Import AI (Jack Clark)",
+      "url": "https://importai.substack.com/feed",
+      "type": "rss",
+      "cadence": "weekly",
+      "status": "candidate",
+      "notes": "Substack \u2192 standard /feed RSS."
+    },
+    {
+      "name": "Interconnects (Nathan Lambert)",
+      "url": "https://www.interconnects.ai/feed",
+      "type": "rss",
+      "cadence": "weekly-ish",
+      "status": "candidate",
+      "notes": "Deep frontier-lab training analysis; Substack RSS."
+    },
+    {
+      "name": "The Batch (deeplearning.ai)",
+      "url": "https://www.deeplearning.ai/the-batch/",
+      "type": "scrape",
+      "cadence": "weekly",
+      "status": "candidate"
+    },
+    {
+      "name": "Ahead of AI (Sebastian Raschka)",
+      "url": "https://magazine.sebastianraschka.com/feed",
+      "type": "rss",
+      "cadence": "monthly-ish",
+      "status": "candidate"
+    },
+    {
+      "name": "Simon Willison's Weblog",
+      "url": "https://simonwillison.net/atom/everything/",
+      "type": "atom",
+      "cadence": "daily",
+      "status": "candidate",
+      "notes": "Highest-signal individual blog on LLM tooling; prolific."
+    },
+    {
+      "name": "Don't Worry About the Vase (Zvi Mowshowitz)",
+      "url": "https://thezvi.substack.com/feed",
+      "type": "rss",
+      "cadence": "several/week",
+      "status": "candidate",
+      "notes": "Exhaustive weekly AI roundups."
+    }
+  ],
+  "youtube": [
+    {
+      "name": "Two Minute Papers",
+      "handle": "@TwoMinutePapers",
+      "type": "youtube-rss",
+      "status": "candidate",
+      "notes": "User already follows. YouTube RSS: youtube.com/feeds/videos.xml?channel_id=<ID> \u2014 resolve channel_id at fetcher setup.",
+      "tier": "core"
+    },
+    {
+      "name": "AI Search",
+      "handle": "@theAIsearch",
+      "type": "youtube-rss",
+      "status": "candidate",
+      "notes": "User already follows.",
+      "tier": "core"
+    },
+    {
+      "name": "Yannic Kilcher",
+      "handle": "@YannicKilcher",
+      "type": "youtube-rss",
+      "status": "candidate",
+      "notes": "Paper deep-dives and ML news.",
+      "tier": "core"
+    },
+    {
+      "name": "AI Explained",
+      "handle": "@aiexplained-official",
+      "type": "youtube-rss",
+      "status": "candidate",
+      "notes": "Measured frontier-model analysis, benchmark deep-dives.",
+      "tier": "core"
+    },
+    {
+      "name": "3Blue1Brown",
+      "handle": "@3blue1brown",
+      "type": "youtube-rss",
+      "status": "candidate",
+      "notes": "Foundational visual explainers, occasional but exceptional.",
+      "tier": "core"
+    },
+    {
+      "name": "Machine Learning Street Talk",
+      "handle": "@MachineLearningStreetTalk",
+      "type": "youtube-rss",
+      "status": "candidate",
+      "notes": "Long-form researcher interviews.",
+      "tier": "core"
+    },
+    {
+      "name": "bycloud",
+      "handle": "@bycloudAI",
+      "type": "youtube-rss",
+      "status": "candidate",
+      "notes": "Fast-paced research-trend recaps.",
+      "tier": "core"
+    },
+    {
+      "name": "Andrej Karpathy",
+      "handle": "@AndrejKarpathy",
+      "type": "youtube-rss",
+      "status": "candidate",
+      "tier": "core"
+    },
+    {
+      "name": "Siraj Raval",
+      "handle": "@SirajRaval",
+      "type": "youtube-rss",
+      "status": "candidate",
+      "tier": "core"
+    },
+    {
+      "name": "Alberta Tech",
+      "handle": "@albertatech",
+      "type": "youtube-rss",
+      "status": "candidate",
+      "tier": "core"
+    },
+    {
+      "name": "David Ondrej",
+      "handle": "@DavidOndrej",
+      "type": "youtube-rss",
+      "status": "candidate",
+      "tier": "core"
+    },
+    {
+      "name": "Bilawal Sidhu",
+      "handle": "@bilawalsidhu",
+      "type": "youtube-rss",
+      "status": "candidate",
+      "tier": "core"
+    },
+    {
+      "name": "EatTheBlocks",
+      "handle": "@EatTheBlocks",
+      "type": "youtube-rss",
+      "status": "candidate",
+      "tier": "core"
+    },
+    {
+      "name": "Stefan 3D AI",
+      "handle": "@stefan_3d_ai",
+      "type": "youtube-rss",
+      "status": "candidate",
+      "tier": "core"
+    },
+    {
+      "name": "House of El: AI",
+      "handle": "@houseofel-ai",
+      "type": "youtube-rss",
+      "status": "candidate",
+      "tier": "core"
+    },
+    {
+      "name": "cozmouz",
+      "handle": "@cozmouz",
+      "type": "youtube-rss",
+      "status": "candidate",
+      "tier": "core"
+    },
+    {
+      "name": "The Simulated Leviathan",
+      "handle": "@SimulatedLeviathan",
+      "type": "youtube-rss",
+      "status": "candidate",
+      "tier": "core"
+    },
+    {
+      "name": "Nerdy Rodent",
+      "handle": "@NerdyRodent",
+      "type": "youtube-rss",
+      "status": "candidate",
+      "tier": "core"
+    },
+    {
+      "name": "Future Thinker @Benji",
+      "handle": "@TheFutureThinker",
+      "type": "youtube-rss",
+      "status": "candidate",
+      "tier": "core"
+    },
+    {
+      "name": "SECourses",
+      "handle": "@SECourses",
+      "type": "youtube-rss",
+      "status": "candidate",
+      "tier": "core"
+    },
+    {
+      "name": "Shared Sapience",
+      "handle": "@SharedSapience",
+      "type": "youtube-rss",
+      "status": "candidate",
+      "tier": "core"
+    },
+    {
+      "name": "ColdFusion",
+      "handle": "@ColdFusion",
+      "type": "youtube-rss",
+      "status": "candidate",
+      "tier": "adjacent"
+    },
+    {
+      "name": "Aperture",
+      "handle": "@ApertureThinking",
+      "type": "youtube-rss",
+      "status": "candidate",
+      "tier": "adjacent"
+    },
+    {
+      "name": "Computerphile",
+      "handle": "@Computerphile",
+      "type": "youtube-rss",
+      "status": "candidate",
+      "tier": "adjacent"
+    },
+    {
+      "name": "Loi Liang Yang",
+      "handle": "@LoiLiangYang",
+      "type": "youtube-rss",
+      "status": "candidate",
+      "tier": "adjacent"
+    },
+    {
+      "name": "Academind",
+      "handle": "@academind",
+      "type": "youtube-rss",
+      "status": "candidate",
+      "tier": "adjacent"
+    },
+    {
+      "name": "Anastasi In Tech",
+      "handle": "@AnastasiInTech",
+      "type": "youtube-rss",
+      "status": "candidate",
+      "tier": "adjacent"
+    },
+    {
+      "name": "Jabrils",
+      "handle": "@Jabrils",
+      "type": "youtube-rss",
+      "status": "candidate",
+      "tier": "adjacent"
+    },
+    {
+      "name": "NeuralNine",
+      "handle": "@NeuralNine",
+      "type": "youtube-rss",
+      "status": "candidate",
+      "tier": "adjacent"
+    },
+    {
+      "name": "Art of the Problem",
+      "handle": "@ArtOfTheProblem",
+      "type": "youtube-rss",
+      "status": "candidate",
+      "tier": "adjacent"
+    },
+    {
+      "name": "Concept Bytes",
+      "handle": "@concept_bytes",
+      "type": "youtube-rss",
+      "status": "candidate",
+      "tier": "adjacent"
+    },
+    {
+      "name": "Nikodem Bartnik",
+      "handle": "@nikodembartnik",
+      "type": "youtube-rss",
+      "status": "candidate",
+      "tier": "adjacent"
+    },
+    {
+      "name": "Income Stream Surfers",
+      "handle": "@Incomestreamsurfers",
+      "type": "youtube-rss",
+      "status": "candidate",
+      "tier": "adjacent"
+    },
+    {
+      "name": "Dr.Semiconductor",
+      "handle": "@Dr.Semiconductor",
+      "type": "youtube-rss",
+      "status": "candidate",
+      "tier": "adjacent"
+    },
+    {
+      "name": "Moon Dev",
+      "handle": "@moondevonyt",
+      "type": "youtube-rss",
+      "status": "candidate",
+      "tier": "adjacent"
+    },
+    {
+      "name": "Rootkid",
+      "handle": "@rootkid_art",
+      "type": "youtube-rss",
+      "status": "candidate",
+      "tier": "adjacent"
+    },
+    {
+      "name": "3D Revolution",
+      "handle": "@3DRevolution",
+      "type": "youtube-rss",
+      "status": "candidate",
+      "tier": "adjacent"
+    },
+    {
+      "name": "Nour's Tech Talk",
+      "handle": "@nourtechtalk",
+      "type": "youtube-rss",
+      "status": "candidate",
+      "tier": "adjacent"
+    }
+  ],
+  "podcasts": [
+    {
+      "name": "Latent Space",
+      "url": "https://api.substack.com/feed/podcast/1084089.rss",
+      "type": "rss",
+      "status": "candidate",
+      "notes": "swyx + Alessio; the AI-engineer podcast. Verify feed URL at fetcher setup."
+    },
+    {
+      "name": "Dwarkesh Podcast",
+      "url": "https://www.dwarkesh.com/feed",
+      "type": "rss",
+      "status": "candidate",
+      "notes": "Long-form frontier-lab leader interviews."
+    },
+    {
+      "name": "Last Week in AI",
+      "url": "https://lastweekin.ai/feed",
+      "type": "rss",
+      "status": "candidate",
+      "notes": "Weekly news roundup; also a Substack."
+    },
+    {
+      "name": "No Priors",
+      "url": null,
+      "type": "rss",
+      "status": "candidate",
+      "notes": "Resolve feed from podcast index at setup."
+    },
+    {
+      "name": "TWIML AI Podcast",
+      "url": "https://twimlai.com/feed/podcast",
+      "type": "rss",
+      "status": "candidate"
+    }
+  ],
+  "kols_x": {
+    "comment": "X/Twitter API is cost-prohibitive for agent aggregation. Strategy: don't poll X directly \u2014 smol.ai's AI News already summarizes 544 AI X accounts daily and we aggregate THAT. Names worth tracking via their blogs/RSS instead: Andrej Karpathy (karpathy.bearblog.dev), Simon Willison, Nathan Lambert, Sebastian Raschka, Zvi Mowshowitz, Jack Clark, Lilian Weng (lilianweng.github.io), Chip Huyen (huyenchip.com), Ethan Mollick (oneusefulthing.org), AK/_akhaliq (HF papers curation)."
+  }
+}

@@ -1,0 +1,283 @@
+<title>The Daily Prompt — {{ date_display }}</title>
+{% include "_style.j2" %}
+
+<div class="layout">
+  <nav class="toc" aria-label="table of contents">
+    <p class="toc-head">In this issue</p>
+    <a href="#s-lead" data-spy="s-lead" class="toc-lead">★ {{ articles[0].headline|truncate(52) }}</a>
+    {% for a in articles[1:] %}
+    <a href="#s-news-{{ loop.index }}" data-spy="s-news-{{ loop.index }}">{{ a.headline|truncate(52) }}</a>
+    {% endfor %}
+    <a href="#s-labs" data-spy="s-labs" class="toc-sec">From the labs</a>
+    {% for s in screens %}
+    <a href="#s-screen-{{ loop.index }}" data-spy="s-screen-{{ loop.index }}">{{ s.headline|truncate(52) }}</a>
+    {% endfor %}
+    {% if papers %}<a href="#s-papers" data-spy="s-papers" class="toc-sec">The papers</a>{% endif %}
+    <a href="#s-community" data-spy="s-community" class="toc-sec">Community dispatches</a>
+    <a href="#s-classifieds" data-spy="s-classifieds" class="toc-sec">Classifieds</a>
+    <a href="#s-wire" data-spy="s-wire" class="toc-sec">The wire</a>
+  </nav>
+
+  <div class="sheet">
+    <header class="masthead">
+      <h1>The Daily Prompt</h1>
+      <p class="motto">Hot off the prompting press</p>
+      <div class="stamp">Issue № {{ issue_no }}<br>Fresh off<br>the pipeline</div>
+    </header>
+
+    <div class="dateline">
+      <span>Vol. I — No. {{ issue_no }}</span>
+      <span>{{ date_display }}</span>
+      <span>Price: 2¢ / 1K tokens</span>
+    </div>
+
+    <div class="ticker" aria-label="daily data ticker">
+      {% for t in ticker %}<span><span class="lbl">{{ t.label }}</span> {{ t.value }}</span>{% endfor %}
+    </div>
+
+    <div class="weatherline">
+      <span class="lbl">GPU Weather:</span> <b>{{ copy.weather.big }}</b> — {{ copy.weather.detail }}
+    </div>
+
+    <section id="s-lead" class="story">
+      <p class="kicker">★ {{ copy.kicker }}</p>
+      <h2 class="headline-xl">{{ articles[0].headline }}</h2>
+      <p class="deck">{{ articles[0].deck }}</p>
+      <p class="byline">By the Wire Desk · from {{ articles[0].source }} · {{ items_scanned }} items scanned</p>
+      <canvas class="banner tall" aria-label="1-bit dithered illustration"></canvas>
+      <div class="cols-2">
+        {% for p in articles[0].paragraphs %}<p>{{ p }}</p>{% endfor %}
+      </div>
+      <p class="turn">→ <a href="{{ articles[0].url }}">source: {{ articles[0].source }}</a></p>
+    </section>
+
+    {% for a in articles[1:] %}
+    <section id="s-news-{{ loop.index }}" class="story">
+      <canvas class="banner" aria-label="section separator, 1-bit pixel art"></canvas>
+      <h2 class="headline-lg">{{ a.headline }}</h2>
+      <p class="deck">{{ a.deck }}</p>
+      <div class="cols-2">
+        {% for p in a.paragraphs %}<p>{{ p }}</p>{% endfor %}
+      </div>
+      <p class="turn">→ <a href="{{ a.url }}">source: {{ a.source }}</a></p>
+    </section>
+    {% endfor %}
+
+    <section id="s-labs" class="story">
+      <canvas class="banner" aria-label="section separator, 1-bit pixel art"></canvas>
+      <h2 class="section-label"><span>From the labs</span> <span class="page-no">Wire briefs</span></h2>
+      <div class="briefs2">
+        {% for b in briefs %}
+        <article class="brief">
+          <h3>{{ b.headline }}</h3>
+          <p>{{ b.body }}</p>
+          <p class="src">→ <a href="{{ b.url }}">source: {{ b.source }}</a></p>
+        </article>
+        {% endfor %}
+      </div>
+    </section>
+
+    {% for s in screens %}
+    <section id="s-screen-{{ loop.index }}" class="story">
+      <canvas class="banner" aria-label="section separator, 1-bit pixel art"></canvas>
+      <p class="kicker">On the screens</p>
+      <h2 class="headline-lg">{{ s.headline }}</h2>
+      <div class="cols-2">
+        {% for p in s.body %}<p>{{ p }}</p>{% endfor %}
+      </div>
+      <p class="turn">→ <a href="{{ s.url }}">watch at {{ s.source }}</a>{% if s.had_transcript %} · written from transcript{% endif %}</p>
+    </section>
+    {% endfor %}
+
+    {% if papers %}
+    <section id="s-papers" class="story">
+      <canvas class="banner" aria-label="section separator, 1-bit pixel art"></canvas>
+      <h2 class="section-label"><span>The papers</span> <span class="page-no">Today's research</span></h2>
+      {% for p in papers %}
+      <article class="paper-story">
+        <h3>{{ p.title }}</h3>
+        <p class="meta">{{ p.meta }}</p>
+        <div class="cols-2">
+          {% for para in p.paragraphs %}<p>{{ para }}</p>{% endfor %}
+        </div>
+        <p class="src">→ <a href="{{ p.url }}">read the paper</a></p>
+      </article>
+      {% endfor %}
+      <p class="turn">→ <a href="#s-wire">All {{ arxiv_new }} new arXiv listings, below on the wire</a></p>
+    </section>
+    {% endif %}
+
+    <section id="s-community" class="story">
+      <canvas class="banner" aria-label="section separator, 1-bit pixel art"></canvas>
+      <h2 class="section-label"><span>Community dispatches</span> <span class="page-no">The forums</span></h2>
+      <div class="briefs2">
+        {% for o in overheard %}
+        <article class="brief">
+          <h3>"{{ o.quote }}"</h3>
+          <p class="meta">{{ o.attribution }}</p>
+          <p>{{ o.context }}</p>
+          <p class="src">→ <a href="{{ o.url }}">join the discussion</a></p>
+        </article>
+        {% endfor %}
+      </div>
+    </section>
+
+    <section id="s-classifieds" class="story">
+      <canvas class="banner" aria-label="section separator, 1-bit pixel art"></canvas>
+      <h2 class="section-label"><span>Classifieds</span></h2>
+      <div class="classifieds">
+        {% for ad in copy.classifieds %}
+        <div class="ad"><b>{{ ad.tag }}</b>{{ ad.body }}</div>
+        {% endfor %}
+      </div>
+    </section>
+
+    <section id="s-wire" class="story">
+      <canvas class="banner" aria-label="section separator, 1-bit pixel art"></canvas>
+      <h2 class="section-label"><span>The wire</span> <span class="page-no">Everything scanned today</span></h2>
+      {% for group in groups %}
+      <div class="wire-group">
+        <h3 class="wire-title">{{ group.title }} <span class="page-no">{{ group['items']|length }} items</span></h3>
+        <ul class="wire-list">
+          {% for i in group['items'] %}
+          <li>
+            <span class="when">{{ i.when }}</span>
+            <span><a href="{{ i.url }}">{{ i.title }}</a>{% if i.snippet %} <span class="snip">— {{ i.snippet }}</span>{% endif %}</span>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% endfor %}
+      <div class="wire-group">
+        <h3 class="wire-title">arXiv — today's listings <span class="page-no">{{ arxiv_items|length }} of {{ arxiv_new }} shown</span></h3>
+        <ul class="wire-list">
+          {% for p in arxiv_items %}
+          <li><span class="when">{{ p.when }}</span> <span><a href="{{ p.url }}">{{ p.title }}</a></span></li>
+          {% endfor %}
+        </ul>
+      </div>
+    </section>
+
+    <p class="colophon">
+      Composed at {{ build_time }} by unpaid agents · edition cost ${{ cost }} · The Daily Prompt regrets its errors, statistically <span class="cursor"></span>
+    </p>
+  </div>
+</div>
+
+<script>
+  (function () {
+    var SEED = {{ seed }};
+    var BAYER = [[0,8,2,10],[12,4,14,6],[3,11,1,9],[15,7,13,5]];
+
+    function hash(x, y, s) {
+      var n = x * 374761393 + y * 668265263 + s * 1274126177;
+      n = (n ^ (n >> 13)) * 1103515245;
+      return ((n ^ (n >> 16)) >>> 0) / 4294967295;
+    }
+
+    // Each scene maps (nx, ny in 0..1, seed) -> luminance 0..1
+    var SCENES = [
+      function sunGrid(nx, ny, s) {
+        var horizon = 0.6, lum;
+        var sx = 0.55 + hash(1, 1, s) * 0.35, sy = 0.2 + hash(2, 2, s) * 0.15;
+        if (ny < horizon) {
+          lum = 0.25 + 0.55 * (ny / horizon);
+          var dx = (nx - sx) * 4, dy = ny - sy, d = Math.sqrt(dx * dx + dy * dy);
+          if (d < 0.16) lum = 0.97; else if (d < 0.18) lum = 0.05;
+        } else {
+          var v = (ny - horizon) / (1 - horizon);
+          lum = 0.55 - 0.25 * v;
+          if (Math.abs((1 / (v + 0.06)) % 1.6) < 0.11) lum = 0.1;
+          var gx = (nx - 0.5) / (0.02 + v * v * 0.5);
+          if (Math.abs((gx % 1.4 + 1.4) % 1.4) < 0.07) lum = 0.1;
+        }
+        return lum;
+      },
+      function ridges(nx, ny, s) {
+        var lum = 0.85 - ny * 0.25;
+        for (var layer = 0; layer < 3; layer++) {
+          var base = 0.35 + layer * 0.2;
+          var ridge = base + 0.12 * Math.sin(nx * (6 + layer * 4) + hash(layer, 7, s) * 9)
+                           + 0.06 * Math.sin(nx * 17 + layer * 3);
+          if (ny > ridge) lum = 0.45 - layer * 0.15;
+        }
+        return lum;
+      },
+      function skyline(nx, ny, s) {
+        var col = Math.floor(nx * 22);
+        var hgt = 0.25 + hash(col, 3, s) * 0.55;
+        if (ny > 1 - hgt) {
+          var wx = Math.floor(nx * 88) % 4, wy = Math.floor(ny * 40) % 4;
+          return (wx === 1 && wy === 1 && hash(Math.floor(nx * 88), Math.floor(ny * 40), s) > 0.5) ? 0.8 : 0.12;
+        }
+        var mx = 0.15 + hash(5, 5, s) * 0.2;
+        var d = Math.sqrt((nx - mx) * (nx - mx) * 6 + (ny - 0.25) * (ny - 0.25));
+        if (d < 0.09) return 0.95;
+        return 0.75 - ny * 0.3;
+      },
+      function waves(nx, ny, s) {
+        var w = Math.sin(nx * 9 + ny * 22 + hash(3, 9, s) * 6) + Math.sin(nx * 23 - ny * 11);
+        var lum = 0.5 + w * 0.22;
+        if (ny < 0.25) lum = 0.8;
+        return lum;
+      },
+      function starfield(nx, ny, s) {
+        var gx = Math.floor(nx * 110), gy = Math.floor(ny * 30);
+        var r = hash(gx, gy, s);
+        if (r > 0.985) return 0.95;
+        var mx = 0.7 + hash(8, 8, s) * 0.2;
+        var d = Math.sqrt((nx - mx) * (nx - mx) * 5 + (ny - 0.4) * (ny - 0.4));
+        if (d < 0.13) { if (Math.sqrt((nx - mx - 0.04) * (nx - mx - 0.04) * 5 + (ny - 0.36) * (ny - 0.36)) < 0.11) return 0.14; return 0.9; }
+        return 0.12;
+      },
+      function circuits(nx, ny, s) {
+        var gx = Math.floor(nx * 30), gy = Math.floor(ny * 8);
+        var lum = 0.78;
+        if (hash(gx, 1, s) > 0.6 && Math.abs(ny * 8 - gy - 0.5) < 0.18) lum = 0.15;
+        if (hash(1, gy, s) > 0.55 && Math.abs(nx * 30 - gx - 0.5) < 0.06) lum = 0.15;
+        if (hash(gx, gy, s) > 0.85) lum = 0.05;
+        return lum;
+      }
+    ];
+
+    function css(name) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+
+    function renderBanners() {
+      var ink = css('--ink') || '#211E18';
+      var paper = css('--paper') || '#E9E4D6';
+      document.querySelectorAll('canvas.banner').forEach(function (canvas, i) {
+        var tall = canvas.classList.contains('tall');
+        var W = 340, H = tall ? 96 : 40, SCALE = 3;
+        var scene = SCENES[(SEED + i) % SCENES.length];
+        var ctx = canvas.getContext('2d');
+        canvas.width = W * SCALE; canvas.height = H * SCALE;
+        for (var y = 0; y < H; y++) for (var x = 0; x < W; x++) {
+          var lum = Math.max(0, Math.min(1, scene(x / W, y / H, SEED + i * 31)));
+          var threshold = (BAYER[y % 4][x % 4] + 0.5) / 16;
+          ctx.fillStyle = lum > threshold ? paper : ink;
+          ctx.fillRect(x * SCALE, y * SCALE, SCALE, SCALE);
+        }
+        ctx.strokeStyle = ink; ctx.lineWidth = SCALE;
+        ctx.strokeRect(SCALE / 2, SCALE / 2, W * SCALE - SCALE, H * SCALE - SCALE);
+      });
+    }
+
+    renderBanners();
+    var mq = window.matchMedia('(prefers-color-scheme: dark)');
+    if (mq.addEventListener) mq.addEventListener('change', renderBanners);
+    new MutationObserver(renderBanners).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+
+    // scrollspy: highlight the ToC entry for the section nearest the top
+    var links = Array.prototype.slice.call(document.querySelectorAll('.toc a[data-spy]'));
+    var sections = links.map(function (a) { return document.getElementById(a.dataset.spy); });
+    function spy() {
+      var best = 0;
+      sections.forEach(function (sec, i) {
+        if (sec && sec.getBoundingClientRect().top < window.innerHeight * 0.35) best = i;
+      });
+      links.forEach(function (a, i) { a.classList.toggle('active', i === best); });
+    }
+    window.addEventListener('scroll', spy, { passive: true });
+    spy();
+  })();
+</script>
