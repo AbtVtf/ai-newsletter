@@ -43,6 +43,14 @@ def write_edition_dir(context, now):
             stale.unlink()
 
     articles = context["articles"]
+    (out_dir / "articles.json").write_text(json.dumps({
+        "date": now.strftime("%Y-%m-%d"),
+        "date_display": context["date_display"],
+        "issue_no": context["issue_no"],
+        "articles": articles,
+        "briefs": context["briefs"],
+        "papers": context["papers"],
+    }, indent=1))
     sections = 1 + (len(articles) - 1) + 1 + len(context["screens"]) + 4
     (out_dir / "stats.json").write_text(json.dumps({
         "date": now.strftime("%Y-%m-%d"),
